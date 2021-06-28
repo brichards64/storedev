@@ -1,6 +1,9 @@
 #include <BStore.h>
 
-BStore::BStore(){m_serialise=true;}
+BStore::BStore(bool type_checking){
+  m_serialise=true;
+  m_type_checking=type_checking;
+}
 
 std::string BStore::GetVersion(){return "BStore:1.0.0";}
 

@@ -25,7 +25,7 @@ int main(){
   std::cout<<"d2"<<std::endl;
   
   BinaryStream e;
-  if(!e.Bopen("bstest2",NEW,POST_PRE_COMPRESS))std::cout<<"failed to open e"<<std::endl;
+  if(!e.Bopen("bstest2",NEW,UNCOMPRESSED))std::cout<<"failed to open e"<<std::endl;
   int f=56;
   float g=55;
   
@@ -69,7 +69,7 @@ int main(){
   std::string c2="";
   std::vector<float> d2;
   BinaryStream e2;
-  if(!  e2.Bopen("bstest3",NEW,POST_PRE_COMPRESS))std::cout<<"failed open e2"<<std::endl;
+  if(!  e2.Bopen("bstest3",NEW,UNCOMPRESSED))std::cout<<"failed open e2"<<std::endl;
   int f2=0;
   float g2=0;
   

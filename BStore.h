@@ -24,7 +24,7 @@ class BStore: public SerialisableObject{
   
  public:
 
-  BStore();
+  BStore(bool type_checking=false);
   int def(FILE *source, FILE *dest, int level);
   int inf(FILE *source, FILE *dest);
   void zerr(int ret);
@@ -192,13 +192,19 @@ class BStore: public SerialisableObject{
   }
 
   bool Serialise(BinaryStream &bs){ // do return properly
-
+    std::cout<<"p1"<<std::endl;
     bs & m_variables;
+    std::cout<<"p2"<<std::endl;
     bs & m_type;
+    std::cout<<"p3"<<std::endl;
     bs & m_type_checking;
+    std::cout<<"p4"<<std::endl;
     if(m_type_checking) bs & m_type_info;
+    std::cout<<"p5"<<std::endl;    
     bs & Header;
+    std::cout<<"p6"<<std::endl;
     bs & m_lookup;
+    std::cout<<"p7"<<std::endl;
 
     return true;
 
@@ -209,6 +215,7 @@ class BStore: public SerialisableObject{
   //std::vector<unsigned int> m_lookup;
 
   BinaryStream output;
+
   private:
   
  

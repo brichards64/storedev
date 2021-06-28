@@ -9,13 +9,17 @@ BinaryStream::BinaryStream(enum_endpoint endpoint){
   m_mode=UPDATE;  
   m_serialise=true;
   pfile=0;
+#ifdef ZLIB
   gzfile=0;
+#endif
 }
 
 BinaryStream::~BinaryStream(){
 
   if((m_endpoint==UNCOMPRESSED || m_endpoint==POST_PRE_COMPRESS) && pfile!=NULL) Bclose(true);
+#ifdef ZLIB
   else if(m_endpoint==COMPRESSED && gzfile!=0) Bclose();
+#endif
 }
 
 
@@ -54,8 +58,10 @@ bool BinaryStream::Bopen(std::string filename, enum_mode method, enum_endpoint e
 #endif
     }
     
+    std::cout<<"m_endpoint before convert="<<m_endpoint<<std::endl;  
     if(m_endpoint==COMPRESSED) m_endpoint=POST_PRE_COMPRESS;
-    std::cout<<"m_endpoint="<<m_endpoint<<std::endl;
+    std::cout<<"m_endpoint after convert="<<m_endpoint<<std::endl;
+    std::cout<<"filename="<<filename<<std::endl;
     if(!Bopen(filename,READ,m_endpoint)) return false; 
     std::cout<<"j1 "<<Btell()<<std::endl;
     if(!Bseek(0,SEEK_END)) return false;
