@@ -26,7 +26,7 @@ class SerialisableObject{
   virtual std::string GetVersion()=0;
   virtual bool Print()=0; ///< Simple virtual Pritn function to ensure inhereted classes have one
   // virtual ~SerialisableObject(){}; ///< Destructor
-  bool m_serialise; ///< Denotes if the calss should be serialised or not when added to a BoostStore. 
+  //bool m_serialise; ///< Denotes if the calss should be serialised or not when added to a BoostStore. 
   //protected:
   
   //std::string type; ///< String to store type of Tool

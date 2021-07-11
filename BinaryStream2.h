@@ -102,10 +102,8 @@ class BinaryStream : public SerialisableObject{
 
  
   template<typename T> bool operator<<(T& rhs){
-    std::cout<<"in write"<<std::endl;
-    if(m_mode!=READ){
+     if(m_mode!=READ){
       if(check_base<SerialisableObject,T>::value){
-	std::cout<<"in serialise object"<<std::endl;
 	SerialisableObject* tmp=reinterpret_cast<SerialisableObject*>(&rhs);
 	m_write=true;
 	return tmp->SerialiseWrapper(*this);
@@ -130,7 +128,6 @@ class BinaryStream : public SerialisableObject{
   
   
   template<typename T> bool operator&(T& rhs){
-    std::cout<<"in &"<<std::endl;
     if(m_write)  return (*this) << rhs;
     else return (*this) >> rhs; 
   }

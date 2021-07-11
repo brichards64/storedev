@@ -7,7 +7,7 @@ BinaryStream::BinaryStream(enum_endpoint endpoint){
   m_write=true;
   m_file_name="";
   m_mode=UPDATE;  
-  m_serialise=true;
+  //  m_serialise=true;
   pfile=0;
 #ifdef ZLIB
   gzfile=0;
@@ -58,24 +58,24 @@ bool BinaryStream::Bopen(std::string filename, enum_mode method, enum_endpoint e
 #endif
     }
     
-    std::cout<<"m_endpoint before convert="<<m_endpoint<<std::endl;  
+    //std::cout<<"m_endpoint before convert="<<m_endpoint<<std::endl;  
     if(m_endpoint==COMPRESSED) m_endpoint=POST_PRE_COMPRESS;
-    std::cout<<"m_endpoint after convert="<<m_endpoint<<std::endl;
-    std::cout<<"filename="<<filename<<std::endl;
+    //std::cout<<"m_endpoint after convert="<<m_endpoint<<std::endl;
+    //std::cout<<"filename="<<filename<<std::endl;
     if(!Bopen(filename,READ,m_endpoint)) return false; 
-    std::cout<<"j1 "<<Btell()<<std::endl;
+    //std::cout<<"j1 "<<Btell()<<std::endl;
     if(!Bseek(0,SEEK_END)) return false;
-    std::cout<<"j2 "<<Btell()<<std::endl;  
+    //std::cout<<"j2 "<<Btell()<<std::endl;  
     unsigned int end= Btell();
-    std::cout<<"j3 end="<<end<<std::endl;
+    //std::cout<<"j3 end="<<end<<std::endl;
     if(!Bseek(0,SEEK_SET)) return false;
-    std::cout<<"j4"<<std::endl;    
+    //std::cout<<"j4"<<std::endl;    
     buffer.resize(end);
-    std::cout<<"j5 end="<<end<<std::endl;
+    //std::cout<<"j5 end="<<end<<std::endl;
     if(!Bread(&(buffer[0]),end)) return false;
-    std::cout<<"j6"<<std::endl;    
+    //std::cout<<"j6"<<std::endl;    
     if(!Bclose()) return false;
-    std::cout<<"j7"<<std::endl;
+    //std::cout<<"j7"<<std::endl;
     m_endpoint=RAM;
     return true;
   }
@@ -277,15 +277,15 @@ bool BinaryStream::Serialise(BinaryStream &bs){ // do return properly
   }
   else{
     if(bs.m_write){
-      std::cout<<"w1"<<std::endl;
+      //std::cout<<"w1"<<std::endl;
       if(!Bclose()) return false;
-      std::cout<<"w2"<<std::endl;
+      //std::cout<<"w2"<<std::endl;
       if(!Bopen(m_file_name,READ,RAM)) return false;
-      std::cout<<"w3"<<std::endl;
+      //std::cout<<"w3"<<std::endl;
       if(!(bs & buffer)) return false;
-      std::cout<<"w4"<<std::endl;
+      //std::cout<<"w4"<<std::endl;
       if(!Bclose()) return false;
-      std::cout<<"w5"<<std::endl;
+      //std::cout<<"w5"<<std::endl;
       return true;
     }
     else{
@@ -451,12 +451,15 @@ void BinaryStream::zerr(int ret){
 }
 
 bool SerialisableObject::SerialiseWrapper(BinaryStream &bs){
-  if(!m_serialise) return false; //not sure i should ahve a serialise flag, causes major issues with empty mapps and vector elements!!!! so remove. People wouldnt be calling serialise method if they didnt want to serialse
-    if(bs.m_write) bs << GetVersion();
-    else{
-      std::string version="";
-      bs >> version;
-      if(version!=GetVersion()) return false;
-    }
-    return Serialise(bs);
+  //  if(!m_serialise) return false; //not sure i should ahve a serialise flag, causes major issues with empty mapps and vector elements!!!! so remove. People wouldnt be calling serialise method if they didnt want to serialse
+  //std::cout<<"in serialise wrapper"<<std::endl;
+  if(bs.m_write){
+    if(!(bs << GetVersion())) return false;
   }
+  else{
+    std::string version="";
+    if(!(bs >> version)) return false;
+    if(version!=GetVersion()) return false;
+  }
+  return Serialise(bs);
+}

@@ -25,9 +25,6 @@ class BStore: public SerialisableObject{
  public:
 
   BStore(bool type_checking=false);
-  int def(FILE *source, FILE *dest, int level);
-  int inf(FILE *source, FILE *dest);
-  void zerr(int ret);
   //  void Init();
   // void Init2();
   bool Initnew(std::string filename, enum_type type=post_pre_compress, bool type_checking=false);    
@@ -122,11 +119,12 @@ class BStore: public SerialisableObject{
      @param in the varaible to be stored.
   */
   template<typename T> bool Set(std::string name,T in){
-
+    std::cout<<"in set"<<std::endl;
     m_variables[name].buffer.clear();
     m_variables[name].m_pos=0;
+    std::cout<<"set serialising"<<std::endl;
     bool ret=m_variables[name] << in;
-  
+    std::cout<<"set serialised ="<<ret<<std::endl;
     if(m_type_checking) m_type_info[name]=typeid(in).name();
     
     return ret;
@@ -191,26 +189,9 @@ class BStore: public SerialisableObject{
     
   }
 
-  bool Serialise(BinaryStream &bs){ // do return properly
-    std::cout<<"p1"<<std::endl;
-    bs & m_variables;
-    std::cout<<"p2"<<std::endl;
-    bs & m_type;
-    std::cout<<"p3"<<std::endl;
-    bs & m_type_checking;
-    std::cout<<"p4"<<std::endl;
-    if(m_type_checking) bs & m_type_info;
-    std::cout<<"p5"<<std::endl;    
-    bs & Header;
-    std::cout<<"p6"<<std::endl;
-    bs & m_lookup;
-    std::cout<<"p7"<<std::endl;
+  bool Serialise(BinaryStream &bs);
 
-    return true;
-
-  }
- 
-  std::map<unsigned int, unsigned int> m_lookup; //why is this a map?? should change it when you ahve had more sleep
+    std::map<unsigned int, unsigned int> m_lookup; //why is this a map?? should change it when you ahve had more sleep
  
   //std::vector<unsigned int> m_lookup;
 
@@ -226,7 +207,7 @@ class BStore: public SerialisableObject{
   unsigned int m_previous_file_end;
   enum_type m_type;
   bool m_type_checking;
-  
+ 
   unsigned int m_flags_start;
   
   

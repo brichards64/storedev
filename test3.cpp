@@ -6,7 +6,7 @@
 #include <unistd.h> //for lseek
 #include <sstream>
 #include <assert.h>
-#include <BStore.h>
+#include <BStore2.h>
 #include <SerialisableObject.h>
 #include <BinaryStream2.h>
 
@@ -22,11 +22,15 @@ public:
   bool Print(){return true;}
   std::string GetVersion(){return "test";}
   bool Serialise(BinaryStream &bs){
-
+    //std::cout<<"SERIALISING a"<<std::endl;
     bs & a;
+    //std::cout<<"SERIALISING b"<<std::endl;
     bs & b;
+    //std::cout<<"SERIALISING c"<<std::endl;
     bs & c;
+    //std::cout<<"SERIALISING d"<<std::endl;
     bs & d;
+    //std::cout<<"SERIALISING FINNISHED"<<std::endl;
 
     return true;
   }
@@ -36,19 +40,18 @@ public:
 
 int main (){
   
-  /*
-  BinaryStream bs;
-  bs.Bopen("appendtest",READ_APPEND,UNCOMPRESSED);
-  for(unsigned int i=0; i<10000; i++){
-  int b=i;
-  std::cout<<"before="<<bs.Btell()<<std::endl;
-  bs.Bseek(0,SEEK_SET);
-  bs<<b;
-  std::cout<<"after="<<bs.Btell()<<std::endl;
-  }
-  bs.Bclose();
-  */
   std::vector<int> stufftest;
+  /*
+    BStore hope;
+ hope.Initnew("nestdata");
+  std::cout<<"hope print"<<std::endl;  
+  for( int i=0;i<10;i++){
+    int m=98+i;  
+    if(! hope.Set("m",m))  std::cout<<"hope failed"<<std::endl;
+    hope.Save();  
+  }
+  hope.Close();
+  */
 
   
   BStore store;
@@ -56,23 +59,18 @@ int main (){
   store.Initnew("storedata");
   std::cout<<"e0.1"<<std::endl;
   
-  /*
-    for(unsigned int i=0; i<5; i++){
-    int a=i;
-    store.Set("a",a);
-    a=0;
-    store.Get("a",a);
-    std::cout<<"a="<<a<<std::endl;
-    store.Save();
-    }
-    store.Close();
-  */
-  
+  //  hope.Initnew("nestdata");  
+
 
   for(unsigned int i=0; i<10; i++){
-    //    store.test["a"]="a";
-    //  std::cout<<"a="<<store.test["a"]<<std::endl;
-    // store.test["b"]="b";
+
+    BStore hope;
+    hope.Initnew("nestdata");
+    int m=98;
+    if(! hope.Set("m",m))  std::cout<<"hope failed"<<std::endl; 
+    std::cout<<"hope print"<<std::endl;
+    hope.Print();    
+
     std::stringstream tmp;
     tmp<<i;
     int a=i*10;
@@ -81,41 +79,47 @@ int main (){
     for(int j=0; j<5; j++){
       d.push_back(j*3.31);
     }
+    
     std::cout<<"e1"<<std::endl;
-    store.Set("c",tmp.str());
+    if(!store.Set("c",tmp.str()))  std::cout<<"store set c failed"<<std::endl;
     std::cout<<"e2"<<std::endl;
-    store.Set("a",a);
+    if(!store.Set("a",a)) std::cout<<"store set a failed"<<std::endl;
     a=9;
-    store.Get("a",a);
+    if(!store.Get("a",a))  std::cout<<"store get a failed"<<std::endl;
     std::cout<<"e3 a="<<a<<std::endl;
-    store.Set("b",b);
-    std::cout<<"e4"<<std::endl;
-    store.Set("d",d);
-    std::cout<<"e4"<<std::endl;
+    if(!store.Set("b",b)) std::cout<<"store set b failed"<<std::endl;
+    std::cout<<"e4.1"<<std::endl;
+    if(!store.Set("d",d)) std::cout<<"store set d failed"<<std::endl;
+    std::cout<<"e4.2"<<std::endl;
  
     mydata test;
+    //    test.m_serialise=true;
     test.a=3;
     test.b=345.678;
     test.c="hello world";
     test.d.push_back(56);
     test.d.push_back(23.45);
-    store.Set("e",test);
+    std::cout<<"e4.3"<<std::endl;
+    if(!store.Set("e",test)) std::cout<<"store set e failed"<<std::endl;
 
-    std::cout<<"e4"<<std::endl;
+    std::cout<<"e4.4"<<std::endl;
     
     float* f=new float;
     *f=888;
     std::cout<<"e5"<<std::endl;
-    store.Set("f",f);
+    if(!store.Set("f",f)) std::cout<<"store set f failed"<<std::endl;
     std::cout<<"e6"<<std::endl;
    //    store.m_variables["c"]=tmp.str().c_str();
     //    store.test2["c"]=tmp.str().c_str();
     //  store.Header[tmp.str().c_str()]=tmp.str().c_str();
     std::cout<<"e7"<<std::endl;
-    store.Save();
+    if(!store.Set("g",hope)) std::cout<<"store set g failed"<<std::endl;
+    std::cout<<"e7.5"<<std::endl;
+    if(!store.Save()) std::cout<<"store save failed"<<std::endl;
     std::cout<<"e8"<<std::endl;
     store.Delete();
     std::cout<<"e9"<<std::endl;
+    hope.Close();
   }
   std::cout<<"e10"<<std::endl;
   std::cout<<"e10.5 store close="<<store.Close()<<std::endl;
@@ -129,7 +133,6 @@ int main (){
 
 
 
-  
   BStore store2;
   std::cout<<"e12"<<std::endl;
   store2.Initnew("storedata");
@@ -180,6 +183,16 @@ int main (){
     int* a2= new int;
     store2.Get("a",a2);
     std::cout<<"*a="<<*a2<<std::endl;
+
+    std::cout<<"pride"<<std::endl;
+    BStore pride;
+        store2.Get("g",pride);
+    std::cout<<"pride print"<<std::endl;
+    pride.Print();
+    int what=0;
+    pride.Get("m",what);
+    std::cout<<"what="<<what<<std::endl;
+
     //    std::cout<<"c="<<store2.m_variables["c"]<<std::endl;
     //  FILE * pFile;
     // char buffer[] = { 'x' , 'y' , 'z' };

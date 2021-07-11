@@ -1,8 +1,9 @@
 #include <BStore.h>
 
 BStore::BStore(bool type_checking){
-  m_serialise=true;
+  //  m_serialise=true;
   m_type_checking=type_checking;
+  
 }
 
 std::string BStore::GetVersion(){return "BStore:1.0.0";}
@@ -10,12 +11,14 @@ std::string BStore::GetVersion(){return "BStore:1.0.0";}
 bool BStore::Initnew(BinaryStream& bs, unsigned int position){
   m_file_end=position;
   m_open_file_end=m_file_end;
+
+
   return true;
 }
 
 
 
-bool BStore::Initnew(std::string filename, enum_type type, bool type_checking){
+bool BStore::Initnew(std::string filename, enum_type type, bool header, bool type_checking){
   struct stat buffer;   
   if(stat (filename.c_str(), &buffer) == 0){ //if file exists    
     std::cout<<"file exists"<<std::endl;
@@ -194,10 +197,11 @@ bool BStore::Save(unsigned int entry){ //defualt save in next entry so need to d
 
 bool BStore::GetHeader(){
   
-    if(!m_lookup.count(0)) return false;
-  //if(!m_lookup.size()) return false;
+  //if(!m_lookup.count(0)) return false;
+  if(!m_lookup.size()) return false;
   output.Bseek(m_lookup[0], SEEK_SET);
   if(!(output >> Header)) return false;
+  
   
   return true;
 }
@@ -238,10 +242,12 @@ bool BStore::Close(){
     std::cout<<"btell="<<output.Btell()<<std::endl;
     std::cout<<"m_file_end"<<m_file_end<<std::endl;
     if(!output.Bseek(m_file_end,SEEK_SET))return false;
+    
     m_lookup[0]=output.Btell();
     std::cout<<"btell="<<output.Btell()<<std::endl;
     std::cout<<"saving header"<<std::endl;
     if(!(output << Header)) return false; 
+    
     std::cout<<"header saved"<<std::endl;
     std::cout<<"btell="<<output.Btell()<<std::endl;
     m_lookup_start= output.Btell();
@@ -434,7 +440,7 @@ bool BStore::Rollback(){
 
   Delete();
   m_lookup.clear();
-
+  
   output.Bseek( m_previous_file_end-(sizeof(m_lookup_start)+sizeof(m_lookup_size)+sizeof(m_type_checking)+sizeof(m_type)+sizeof(m_previous_file_end)), SEEK_SET);
   std::cout<<"current pos-11="<<output.Btell()<<std::endl;
   m_flags_start=output.Btell();
@@ -469,7 +475,28 @@ bool BStore::Rollback(){
   return true;
 }
 
+bool BStore::Serialise(BinaryStream &bs){ // do return properly
+    
+  std::cout<<"p1"<<std::endl;
+    if(!(bs & m_variables)) return false;
+    std::cout<<"p2"<<std::endl;
+    if(!(bs & m_type)) return false;
+    std::cout<<"p3"<<std::endl;
+    if(!(bs & m_type_checking)) return false;
+    std::cout<<"p4"<<std::endl;
+    if(m_type_checking){
+      if(!(bs & m_type_info)) return false;
+    }
+    std::cout<<"p5"<<std::endl;
+    if(!(bs & Header)) return false;
+    std::cout<<"p6"<<std::endl;
+    if(!(bs & m_lookup)) return false;
+    std::cout<<"p7"<<std::endl;
+  
+    return true;
 
+  }
+ 
 
 
 
